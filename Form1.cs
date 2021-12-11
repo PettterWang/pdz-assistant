@@ -418,23 +418,29 @@ namespace pdz助手
 
                 var myModule = _process.ModuleFactory["ssReader.exe"].BaseAddress;
 
-                //读取前言页
-                var address1 = _process.Memory.GetAddress(myModule + 0x00598C54, new[] { 0x0, 0x164, 0x654, 0x390 });
-                var value1 = _process.Memory.Read<int>(address1);
-                //读取目录页
-                var address2 = _process.Memory.GetAddress(myModule + 0x00598C54, new[] { 0x0, 0x164, 0x654, 0x394 });
-                var value2 = _process.Memory.Read<int>(address2);
-                //读取正文页
-                var address3 = _process.Memory.GetAddress(myModule + 0x00598C54, new[] { 0x0, 0x164, 0x654, 0x398 });
-                var value3 = _process.Memory.Read<int>(address3);
+                try
+                {
+                    //读取前言页
+                    var address1 = _process.Memory.GetAddress(myModule + 0x00598C54, new[] { 0x0, 0x164, 0x654, 0x390 });
+                    var value1 = _process.Memory.Read<int>(address1);
+                    //读取目录页
+                    var address2 = _process.Memory.GetAddress(myModule + 0x00598C54, new[] { 0x0, 0x164, 0x654, 0x394 });
+                    var value2 = _process.Memory.Read<int>(address2);
+                    //读取正文页
+                    var address3 = _process.Memory.GetAddress(myModule + 0x00598C54, new[] { 0x0, 0x164, 0x654, 0x398 });
+                    var value3 = _process.Memory.Read<int>(address3);
 
-                //
-                int 页总数 = value1 + value2 + value3;
+                    //
+                    int 页总数 = value1 + value2 + value3;
 
-                //
-                textBox_总页数.Text = 页总数.ToString();
+                    //
+                    textBox_总页数.Text = 页总数.ToString();
 
-                //_process.Memory.Write(address, value * 1000); //写内存示例
+                    //_process.Memory.Write(address, value * 1000); //写内存示例
+                }
+                catch (Exception e){
+                    Console.WriteLine(e);
+                }
             }
         }
 
@@ -468,9 +474,23 @@ namespace pdz助手
 
         private void button1_Click_1(object sender, EventArgs e)
         {
-            自动读取页总数();
+            //自动设置目录();
         }
 
+        public void 自动设置目录()
+        {
+            //设置png存储目录
+            string png存储目录 = @"C:\Users\" + 当前用户名 + @"\Desktop\" + "png存储目录";
+            //创建文件夹
+            Directory.CreateDirectory(png存储目录);
+            //
+            textBox_png存储目录.Text = png存储目录;
+
+            //设置pdf存储目录
+            string pdf存储目录 = @"C:\Users\" + 当前用户名 + @"\Desktop\1.pdf";
+            //
+            textBox_pdf存储目录.Text = pdf存储目录;
+        }
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -481,8 +501,11 @@ namespace pdz助手
             缓冲器路径 = @"C:\Users\" + 当前用户名 + @"\AppData\Local\Temp\buffer";
 
             //
-            textBox_png存储目录_TextChanged(sender, e);
-            textBox_pdf存储目录_TextChanged(sender, e);
+            //textBox_png存储目录_TextChanged(sender, e);
+            //textBox_pdf存储目录_TextChanged(sender, e);
+
+            //
+            自动设置目录();
         }
 
         private void button_查看缓存器_Click(object sender, EventArgs e)
