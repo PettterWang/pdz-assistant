@@ -897,7 +897,7 @@ namespace pdz助手
 			return true;
 		}
 
-		public static bool SendMessage(IntPtr hWnd, Key key, bool checkKeyboardState, int delay = 100)
+		public static bool SendMessage(IntPtr hWnd, Key key, bool checkKeyboardState, int delay = 1)
 		{
 			if (checkKeyboardState)
 				CheckKeyShiftState();
@@ -920,7 +920,7 @@ namespace pdz助手
 			return true;
 		}
 
-		public static bool SendMessageAll(IntPtr hWnd, Key key, bool alt, bool ctrl, bool shift, int delay = 100)
+		public static bool SendMessageAll(IntPtr hWnd, Key key, bool alt, bool ctrl, bool shift, int delay = 1)
 		{
 			CheckKeyShiftState();
 			uint intReturn;

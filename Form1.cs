@@ -39,6 +39,7 @@ namespace pdz助手
         public int 上一次bmp数量 = 0;
 
         public bool 是否正在一键转换 = false;
+        public bool 是否处于阅读模式 = false;
 
         [DllImport("User32.dll")]
         public static extern Int32 SendMessage(int hWnd, int Msg, int wParam, IntPtr lParam);
@@ -420,21 +421,62 @@ namespace pdz助手
 
                 try
                 {
-                    //读取前言页
-                    var address1 = _process.Memory.GetAddress(myModule + 0x00598C54, new[] { 0x0, 0x164, 0x654, 0x390 });
-                    var value1 = _process.Memory.Read<int>(address1);
-                    //读取目录页
-                    var address2 = _process.Memory.GetAddress(myModule + 0x00598C54, new[] { 0x0, 0x164, 0x654, 0x394 });
-                    var value2 = _process.Memory.Read<int>(address2);
-                    //读取正文页
-                    var address3 = _process.Memory.GetAddress(myModule + 0x00598C54, new[] { 0x0, 0x164, 0x654, 0x398 });
-                    var value3 = _process.Memory.Read<int>(address3);
 
-                    //
-                    int 页总数 = value1 + value2 + value3;
+                    //读取tab
+                    var address_tab = _process.Memory.GetAddress(myModule + 0x00598C54, new[] { 0x0, 0x130, 0x3C, 0x8C, 0x84, 0x44, 0x598 });
+                    var value_tab = _process.Memory.Read<int>(address_tab);
 
-                    //
-                    textBox_总页数.Text = 页总数.ToString();
+                    if (value_tab != 0)
+                    {
+                        //
+                        是否处于阅读模式 = true;
+
+                        //读取前言页
+                        var address1 = _process.Memory.GetAddress(myModule + 0x00598C54, new[] { 0x0, 0x164, 0x654, 0x390 });
+                        var value1 = _process.Memory.Read<int>(address1);
+                        //读取目录页
+                        var address2 = _process.Memory.GetAddress(myModule + 0x00598C54, new[] { 0x0, 0x164, 0x654, 0x394 });
+                        var value2 = _process.Memory.Read<int>(address2);
+                        //读取正文页
+                        var address3 = _process.Memory.GetAddress(myModule + 0x00598C54, new[] { 0x0, 0x164, 0x654, 0x398 });
+                        var value3 = _process.Memory.Read<int>(address3);
+
+                        //
+                        int 页总数 = value1 + value2 + value3;
+                        //
+                        textBox_总页数.Text = 页总数.ToString();
+                    }
+                    else
+                    {
+                        //
+                        是否处于阅读模式 = false;
+                        //
+                        进度与提示("ssReader未处于阅读模式", 0, Color.Red);
+                        气泡控制器.Enabled = true;
+                    }
+
+                    ////读取阅读比例
+                    //var address4 = _process.Memory.GetAddress(myModule + 0x00598C54, new[] { 0x0, 0x164, 0x658, 0x30 });
+                    //var value4 = _process.Memory.Read<float>(address4);
+
+                    ////
+                    //float 阅读比例 = value4;
+                    ////
+                    //阅读比例 = float.Parse(阅读比例.ToString("0.00"));
+                    ////
+                    //if (阅读比例 > 0.05f && 阅读比例 < 1.00f)
+                    //{
+                    //    //
+                    //    是否处于阅读模式 = true;
+                    //}
+                    //else
+                    //{
+                    //    //
+                    //    是否处于阅读模式 = false;
+                    //    //
+                    //    进度与提示("ssReader未处于阅读模式", 0, Color.Red);
+                    //    气泡控制器.Enabled = true;
+                    //}
 
                     //_process.Memory.Write(address, value * 1000); //写内存示例
                 }
@@ -453,7 +495,7 @@ namespace pdz助手
             //
             自动读取页总数();
             //
-            if (是否最大化 == true && png目录是否存在 == true && pdf目录是否存在 == true && textBox_总页数.Text!=string.Empty && textBox_总页数.Text != "0")
+            if (是否最大化 == true && png目录是否存在 == true && pdf目录是否存在 == true && textBox_总页数.Text!=string.Empty && textBox_总页数.Text != "0" && 是否处于阅读模式 == true)
             {
                 button_一键转换.Enabled = true;
             }
@@ -474,7 +516,7 @@ namespace pdz助手
 
         private void button1_Click_1(object sender, EventArgs e)
         {
-            //自动设置目录();
+            
         }
 
         public void 自动设置目录()
@@ -501,11 +543,11 @@ namespace pdz助手
             缓冲器路径 = @"C:\Users\" + 当前用户名 + @"\AppData\Local\Temp\buffer";
 
             //
-            //textBox_png存储目录_TextChanged(sender, e);
-            //textBox_pdf存储目录_TextChanged(sender, e);
+            自动设置目录();
 
             //
-            自动设置目录();
+            textBox_png存储目录_TextChanged(sender, e);
+            textBox_pdf存储目录_TextChanged(sender, e);
         }
 
         private void button_查看缓存器_Click(object sender, EventArgs e)
@@ -548,9 +590,6 @@ namespace pdz助手
             }
             
             //
-
-
-            //
             是否正在一键转换 = true;
 
             //
@@ -580,7 +619,7 @@ namespace pdz助手
                 new Thread(() =>
                 {
                     //
-                    Thread.CurrentThread.IsBackground = true;
+                    Thread.CurrentThread.IsBackground = false;
 
                     //按下Home
                     Key a = new Key(Messaging.VKeys.KEY_HOME);
@@ -624,7 +663,7 @@ namespace pdz助手
                         }
 
                         //超时检测
-                        if (持续间隔 >= 100)
+                        if (持续间隔 >= 1000)
                         {
                             //
                             进度与提示("bmp释放失败，请检查 ①[总页数]是否设置正确 ②是否进入[阅读模式]", 0, Color.Red);

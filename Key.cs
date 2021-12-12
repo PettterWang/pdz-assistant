@@ -160,7 +160,9 @@ namespace pdz助手
 		/// <returns>If the key press succeeded or failed.</returns>
 		public bool PressBackground(IntPtr hWnd)
 		{
+			//
 			bool alt = false, ctrl = false, shift = false;
+			//
 			switch (ShiftType)
 			{
 				case Messaging.ShiftType.ALT:
@@ -185,6 +187,7 @@ namespace pdz助手
 					shift = true;
 					break;
 			}
+			//
 			if (!Messaging.SendMessageAll(hWnd, this, alt, ctrl, shift))
 			{
 				_buttonCounter++;
