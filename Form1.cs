@@ -48,10 +48,6 @@ namespace pdz助手
         static extern int GetWindowLong(IntPtr hWnd, int nIndex);
 
         [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        static extern bool IsIconic(IntPtr hWnd);
-
-        [DllImport("user32.dll")]
         static extern IntPtr GetForegroundWindow();
 
         [DllImport("user32.dll")]
@@ -67,6 +63,7 @@ namespace pdz助手
             [DllImport("shlwapi.dll", CharSet = CharSet.Unicode)]
             public static extern int StrCmpLogicalW(string psz1, string psz2);
         }
+
         public sealed class 对文件按名称自然序排序 : IComparer<FileInfo>
         {
             public int Compare(FileInfo a, FileInfo b)
@@ -451,7 +448,7 @@ namespace pdz助手
                         //
                         是否处于阅读模式 = false;
                         //
-                        进度与提示("ssReader未处于阅读模式", 0, Color.Red);
+                        进度与提示("检测到ssReader未处于阅读模式(若有误，请重新启动ssReader即可)", 0, Color.Red);
                         气泡控制器.Enabled = true;
                     }
 
@@ -516,7 +513,7 @@ namespace pdz助手
 
         private void button1_Click_1(object sender, EventArgs e)
         {
-
+            //
         }
 
         public void 自动设置目录()
@@ -673,10 +670,10 @@ namespace pdz助手
 
                             //
                             int 缺少页 = Int32.Parse(textBox_总页数.Text) - BmpCount;
-                            DialogResult dialogResult = MessageBox.Show("此pdz共有" + textBox_总页数.Text + "页,"
-                                                                        +"现共释放了" + BmpCount.ToString() + "页,"
-                                                                        +"缺少" + 缺少页.ToString() + "页,"
-                                                                        +"是否继续合成pdf?", "提示:", MessageBoxButtons.YesNo);
+                            DialogResult dialogResult = MessageBox.Show("此pdz共有" + textBox_总页数.Text + "页，"
+                                                                        +"现共释放了" + BmpCount.ToString() + "页，"
+                                                                        +"缺少" + 缺少页.ToString() + "页，"
+                                                                        +"是否继续合成pdf？", "提示：", MessageBoxButtons.YesNo);
                             if (dialogResult == DialogResult.Yes)
                             {
                                 强行合成 = true;
