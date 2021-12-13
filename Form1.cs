@@ -415,12 +415,12 @@ namespace pdz助手
             var process = System.Diagnostics.Process.GetProcessesByName("ssReader").FirstOrDefault();
             if (process != null)
             {
-                ProcessSharp _process = new ProcessSharp(process, MemoryType.Remote);
-
-                var myModule = _process.ModuleFactory["ssReader.exe"].BaseAddress;
-
                 try
                 {
+                    //
+                    ProcessSharp _process = new ProcessSharp(process, MemoryType.Remote);
+                    //
+                    var myModule = _process.ModuleFactory["ssReader.exe"].BaseAddress;
 
                     //读取tab
                     var address_tab = _process.Memory.GetAddress(myModule + 0x00598C54, new[] { 0x0, 0x130, 0x3C, 0x8C, 0x84, 0x44, 0x598 });
@@ -516,7 +516,7 @@ namespace pdz助手
 
         private void button1_Click_1(object sender, EventArgs e)
         {
-            
+
         }
 
         public void 自动设置目录()
@@ -626,6 +626,9 @@ namespace pdz助手
                     a.PressBackground(ssReaderHandle);
 
                     //
+                    bool 强行合成 = false;
+
+                    //
                     while (true)
                     {
                         //按下PgDown
@@ -637,7 +640,7 @@ namespace pdz助手
 
                         //统计bmp数量
                         int BmpCount = Directory.GetFiles(缓冲器路径, "*.bmp", SearchOption.AllDirectories).Length;
-                        if (BmpCount >= Int32.Parse(textBox_总页数.Text))
+                        if (BmpCount >= Int32.Parse(textBox_总页数.Text) || 强行合成 == true)
                         {
                             //
                             进度与提示("bmp完成释放，正在转换为png...", 20, Color.Black);
@@ -666,10 +669,22 @@ namespace pdz助手
                         if (持续间隔 >= 1000)
                         {
                             //
-                            进度与提示("bmp释放失败，请检查 ①[总页数]是否设置正确 ②是否进入[阅读模式]", 0, Color.Red);
+                            进度与提示("bmp释放失败，请检查 ①是否进入[阅读模式] ②是否有显示[此页无效]的损坏页", 0, Color.Red);
 
                             //
-                            break;
+                            int 缺少页 = Int32.Parse(textBox_总页数.Text) - BmpCount;
+                            DialogResult dialogResult = MessageBox.Show("此pdz共有" + textBox_总页数.Text + "页,"
+                                                                        +"现共释放了" + BmpCount.ToString() + "页,"
+                                                                        +"缺少" + 缺少页.ToString() + "页,"
+                                                                        +"是否继续合成pdf?", "提示:", MessageBoxButtons.YesNo);
+                            if (dialogResult == DialogResult.Yes)
+                            {
+                                强行合成 = true;
+                            }
+                            else if (dialogResult == DialogResult.No)
+                            {
+                                break;
+                            }
                         }
 
                         //
